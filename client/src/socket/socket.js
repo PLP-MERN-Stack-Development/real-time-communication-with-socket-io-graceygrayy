@@ -21,6 +21,7 @@ export const useSocket = () => {
   const [messages, setMessages] = useState([]);
   const [users, setUsers] = useState([]);
   const [typingUsers, setTypingUsers] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   // Connect to socket server
   const connect = (username) => {
@@ -48,6 +49,21 @@ export const useSocket = () => {
   // Set typing status
   const setTyping = (isTyping) => {
     socket.emit('typing', isTyping);
+  };
+
+  // Mark message as read
+  const markRead = (messageId) => {
+    socket.emit('mark_read', messageId);
+  };
+
+  // Add reaction to message
+  const addReaction = (messageId, reaction) => {
+    socket.emit('add_reaction', { messageId, reaction });
+  };
+
+  // Remove reaction from message
+  const removeReaction = (messageId, reaction) => {
+    socket.emit('remove_reaction', { messageId, reaction });
   };
 
   // Socket event listeners
@@ -108,6 +124,49 @@ export const useSocket = () => {
       setTypingUsers(users);
     };
 
+    // Reaction events
+    const onReactionAdded = ({ messageId, reaction, userId }) => {
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.id === messageId
+            ? {
+                ...m,
+                reactions: {
+                  ...m.reactions,
+                  [reaction]: [...(m.reactions?.[reaction] || []), userId].filter(
+                    (v, i, a) => a.indexOf(v) === i
+                  ),
+                },
+              }
+            : m
+        )
+      );
+    };
+
+    const onReactionRemoved = ({ messageId, reaction, userId }) => {
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.id === messageId
+            ? {
+                ...m,
+                reactions: {
+                  ...m.reactions,
+                  [reaction]: (m.reactions?.[reaction] || []).filter((id) => id !== userId),
+                },
+              }
+            : m
+        )
+      );
+    };
+
+    const onMessageRead = ({ messageId, userId }) => {
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.id === messageId ? { ...m, readBy: { ...m.readBy, [userId]: true } } : m
+        )
+      );
+    };
+
     // Register event listeners
     socket.on('connect', onConnect);
     socket.on('disconnect', onDisconnect);
@@ -117,6 +176,9 @@ export const useSocket = () => {
     socket.on('user_joined', onUserJoined);
     socket.on('user_left', onUserLeft);
     socket.on('typing_users', onTypingUsers);
+    socket.on('reaction_added', onReactionAdded);
+    socket.on('reaction_removed', onReactionRemoved);
+    socket.on('message_read', onMessageRead);
 
     // Clean up event listeners
     return () => {
@@ -128,6 +190,9 @@ export const useSocket = () => {
       socket.off('user_joined', onUserJoined);
       socket.off('user_left', onUserLeft);
       socket.off('typing_users', onTypingUsers);
+      socket.off('reaction_added', onReactionAdded);
+      socket.off('reaction_removed', onReactionRemoved);
+      socket.off('message_read', onMessageRead);
     };
   }, []);
 
@@ -138,11 +203,15 @@ export const useSocket = () => {
     messages,
     users,
     typingUsers,
+    unreadCount,
     connect,
     disconnect,
     sendMessage,
     sendPrivateMessage,
     setTyping,
+    markRead,
+    addReaction,
+    removeReaction,
   };
 };
 
