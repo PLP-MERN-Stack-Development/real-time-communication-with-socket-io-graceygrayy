@@ -1,0 +1,26 @@
+* { box-sizing: border-box; }
+body { font-family: Arial, Helvetica, sans-serif; margin: 0; background: #f6f8fb; }
+.app { height: 100vh; display: flex; align-items: center; justify-content: center; }
+.login { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+.login input { padding: 0.5rem; margin-right: 0.5rem; }
+.login button { padding: 0.5rem 1rem; }
+.chat { display: flex; width: 90vw; height: 85vh; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+.sidebar { width: 220px; border-right: 1px solid #eee; padding: 1rem; display: flex; flex-direction: column; }
+.user-info { margin-bottom: 1rem; }
+.logout { margin-top: 8px; }
+.users { flex: 1; overflow: auto; }
+.users ul { list-style: none; padding: 0; margin: 0; }
+.users li { margin-bottom: 6px; }
+.users button { width: 100%; text-align: left; background: none; border: none; padding: 6px; border-radius: 4px; cursor: pointer; }
+.users button.selected { background: #eef; }
+.main { flex: 1; display: flex; flex-direction: column; }
+.messages { flex: 1; padding: 1rem; overflow: auto; }
+.message { margin-bottom: 12px; padding: 8px 10px; background: #f2f4f7; border-radius: 6px; max-width: 70%; }
+.message.mine { margin-left: auto; background: #dbefff; }
+.message.system { text-align: center; background: transparent; color: #666; }
+.meta { font-size: 0.8rem; color: #333; display: flex; justify-content: space-between; }
+.body { margin-top: 6px; }
+.composer { display: flex; border-top: 1px solid #eee; padding: 10px; }
+.composer input { flex: 1; padding: 8px; margin-right: 8px; }
+.composer button { padding: 8px 12px; }
+.typing { padding: 0 1rem 6px; color: #666; font-size: 0.9rem; }
